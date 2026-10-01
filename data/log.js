@@ -13,6 +13,7 @@ function normalizeItem(item) {
   if (typeof item === 'string') return { id: item, servings: 1 };
   const out = { id: item.id, servings: item.servings || 1 };
   if (item.overrides) out.overrides = item.overrides; // quantités d'ingrédients ajustées
+  if (item.with) out.with = item.with;                // accompagnement lié au midi / au soir
   return out;
 }
 
@@ -21,7 +22,10 @@ function normalizeEntry(entry) {
   ['starter', 'lunch', 'dinner', 'sides', 'sweet'].forEach(slot => {
     meals[slot] = (entry.meals?.[slot] || []).map(normalizeItem);
   });
-  return { date: entry.date, meals };
+  const out = { date: entry.date, meals };
+  // imprévu : plat d'origine conservé pour pouvoir annuler
+  if (entry.outside && Object.keys(entry.outside).length) out.outside = entry.outside;
+  return out;
 }
 
 export function getLog() {
